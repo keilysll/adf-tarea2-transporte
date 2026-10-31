@@ -27,6 +27,9 @@
 			"transformations": [
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -52,8 +55,11 @@
 				"          DemandaNoAtendida = toInteger(trim(DemandaNoAtendida)),",
 				"          Metodo = upper(trim(Metodo)),",
 				"          ValidacionesTarjeta = toInteger(trim(ValidacionesTarjeta)),",
+				"          RutaHistoricaId = iif(startsWith(upper(trim(RutaHistoricaId)),'RH-'), upper(trim(RutaHistoricaId)), concat('RH-', lpad(replace(replace(replace(upper(trim(RutaHistoricaId)),'RUTA',''),'R-',''),' ',''), 2, '0'))),",
 				"          FechaServicio = iif(instr(trim(FechaServicio),'-')>0, toDate(trim(FechaServicio),'yyyy-MM-dd'), toDate(trim(FechaServicio),'dd/MM/yyyy'))) ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"derivedColumn1 derive(DemandaId = concat('DEM-', toString(FechaServicio,'yyyyMMdd'), '-', RutaHistoricaId, '-', ParadaHistoricaId, '-', replace(substring(Franja,1,5),':','')),",
+				"          AnioFuente = year(FechaServicio)) ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          AnioFuente as string,",
@@ -76,7 +82,6 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          AnioFuente,",
 				"          DemandaId,",
 				"          RutaHistoricaId,",
 				"          ParadaHistoricaId,",
