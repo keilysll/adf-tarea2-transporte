@@ -147,7 +147,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dt_silver_demandas_paradas",
+						"referenceName": "dt_silver_incidentes",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -178,7 +178,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dt_silver_incidentes",
+						"referenceName": "dt_silver_demandas_paradas",
 						"type": "DataFlowReference"
 					},
 					"compute": {
