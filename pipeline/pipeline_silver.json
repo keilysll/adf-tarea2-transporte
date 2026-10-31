@@ -54,7 +54,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dt_bronze_vehiculos",
+						"referenceName": "dt_silver_vehiculos",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -85,7 +85,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dt_bronze_viajes",
+						"referenceName": "dt_silver_viajes",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -116,7 +116,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dt_bronze_paradas",
+						"referenceName": "dt_silver_paradas",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -215,6 +215,7 @@
 				}
 			}
 		],
+		"concurrency": 5,
 		"annotations": []
 	}
 }
