@@ -67,7 +67,7 @@
 				"derivedColumn1 derive(RutaHistoricaId = trim(RutaHistoricaId)) ~> derivedColumn2",
 				"derivedColumn3 aggregate(groupBy(RutaHistoricaId),",
 				"     each(match(name != 'RutaHistoricaId'), $$ = first($$))) ~> aggregate1",
-				"aggregate1 split(!isNull(CodigoRuta) && !isNull(NombreRuta) && !isNull(Origen) && !isNull(Destino) && !isNull(VigenciaDesde) && !isNull(VigenciaHasta) && VigenciaHasta >= VigenciaDesde && in(['ACTIVA','RETIRADA','DIVIDIDA'], Estado),",
+				"aggregate1 split(!isNull(RutaHistoricaId) && !isNull(CodigoRuta) && !isNull(NombreRuta) && !isNull(Origen) && !isNull(Destino) && !isNull(VigenciaDesde) && !isNull(VigenciaHasta) && VigenciaHasta >= VigenciaDesde && in(['ACTIVA','RETIRADA','DIVIDIDA'], Estado),",
 				"     disjoint: false) ~> split1@(valido, otro)",
 				"derivedColumn2 derive(RutaHistoricaId = concat(CodigoRuta, '_', toString(VigenciaDesde, 'yyyyMMdd'))) ~> derivedColumn3",
 				"split1@valido sink(allowSchemaDrift: true,",
