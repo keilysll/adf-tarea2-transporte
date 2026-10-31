@@ -27,9 +27,6 @@
 			"transformations": [
 				{
 					"name": "derivedColumn1"
-				},
-				{
-					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -56,8 +53,7 @@
 				"          Metodo = upper(trim(Metodo)),",
 				"          ValidacionesTarjeta = toInteger(trim(ValidacionesTarjeta)),",
 				"          FechaServicio = iif(instr(trim(FechaServicio),'-')>0, toDate(trim(FechaServicio),'yyyy-MM-dd'), toDate(trim(FechaServicio),'dd/MM/yyyy'))) ~> derivedColumn1",
-				"derivedColumn1 derive(DemandaId = concat('DEM-', toString(FechaServicio,'yyyyMMdd'), '-', RutaHistoricaId, '-', ParadaHistoricaId, '-', replace(substring(Franja,1,5),':',''))) ~> derivedColumn2",
-				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          AnioFuente as string,",
