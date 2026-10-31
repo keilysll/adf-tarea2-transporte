@@ -36,6 +36,9 @@
 				},
 				{
 					"name": "split1"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -62,10 +65,11 @@
 				"          VigenciaDesde = coalesce(toDate(trim(VigenciaDesde), 'dd/MM/yyyy'), toDate(trim(VigenciaDesde), 'yyyy-MM-dd')),",
 				"          VigenciaHasta = coalesce(toDate(trim(VigenciaHasta), 'dd/MM/yyyy'), toDate(trim(VigenciaHasta), 'yyyy-MM-dd'))) ~> derivedColumn1",
 				"derivedColumn1 derive(RutaHistoricaId = trim(RutaHistoricaId)) ~> derivedColumn2",
-				"derivedColumn2 aggregate(groupBy(RutaHistoricaId),",
+				"derivedColumn3 aggregate(groupBy(RutaHistoricaId),",
 				"     each(match(name != 'RutaHistoricaId'), $$ = first($$))) ~> aggregate1",
 				"aggregate1 split(!isNull(CodigoRuta) && !isNull(NombreRuta) && !isNull(Origen) && !isNull(Destino) && !isNull(VigenciaDesde) && !isNull(VigenciaHasta) && VigenciaHasta >= VigenciaDesde && in(['ACTIVA','RETIRADA','DIVIDIDA'], Estado),",
 				"     disjoint: false) ~> split1@(valido, otro)",
+				"derivedColumn2 derive(RutaHistoricaId = concat(CodigoRuta, '_', toString(VigenciaDesde, 'yyyyMMdd'))) ~> derivedColumn3",
 				"split1@valido sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
