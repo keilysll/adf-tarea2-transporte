@@ -33,6 +33,9 @@
 				},
 				{
 					"name": "split1"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -65,7 +68,11 @@
 				"derivedColumn1 derive(ViajeId = concat(toString(year(FechaServicio)),'-',regexReplace(trim(ViajeId),'[^0-9]',''))) ~> derivedColumn2",
 				"derivedColumn2 split(!isNull(ViajeId) && !isNull(RutaHistoricaId) && !isNull(VehiculoId) && !isNull(FechaServicio) && !isNull(HoraProgramada) && !isNull(HoraSalida) && !isNull(HoraLlegada) && !isNull(ValidacionesTarjeta) && !isNull(KmRecorridos) && !isNull(EstadoViaje) && HoraLlegada > HoraSalida,",
 				"     disjoint: false) ~> split1@(valido, otros)",
-				"split1@valido sink(allowSchemaDrift: true,",
+				"split1@valido aggregate(groupBy(ViajeId,",
+				"          {} = ERROR_FUNCTION('')),",
+				"     columna1 = ERROR_FUNCTION(''),",
+				"          each(match(name != 'ViajeId'), $$ = first($$))) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          ViajeId as string,",
