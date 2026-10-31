@@ -33,6 +33,12 @@
 				},
 				{
 					"name": "derivedColumn3"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "split1"
 				}
 			],
 			"scriptLines": [
@@ -59,8 +65,13 @@
 				"derivedColumn1 derive(Latitud = toDecimal(trim(Latitud)),",
 				"          Longitud = toDecimal(trim(Longitud))) ~> derivedColumn2",
 				"derivedColumn2 derive(VigenciaDesde = iif(instr(VigenciaHasta, '/') > 0, toDate(VigenciaHasta, 'dd/MM/yyyy'), toDate(VigenciaHasta, 'yyyy-MM-dd')),",
-				"          VigenciaHasta = iif(instr(VigenciaDesde, '/') > 0, toDate(VigenciaDesde, 'dd/MM/yyyy'), toDate(VigenciaDesde, 'yyyy-MM-dd'))) ~> derivedColumn3",
-				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"          VigenciaHasta = iif(instr(VigenciaDesde, '/') > 0, toDate(VigenciaDesde, 'dd/MM/yyyy'), toDate(VigenciaDesde, 'yyyy-MM-dd')),",
+				"          CodigoPublicado = iif(isNull(CodigoPublicado) || length(trim(CodigoPublicado))==0, upper(trim(ParadaHistoricaId)), upper(trim(CodigoPublicado)))) ~> derivedColumn3",
+				"derivedColumn3 aggregate(groupBy(ParadaHistoricaId),",
+				"     each(match(name != 'ParadaHistoricaId'), $$ = first($$))) ~> aggregate1",
+				"aggregate1 split(  !isNull(ParadaHistoricaId) && !isNull(CodigoPublicado) && !isNull(NombreParada) && !isNull(Zona) && !isNull(Latitud) && !isNull(Longitud) && !isNull(VigenciaDesde) && !isNull(VigenciaHasta) && !isNull(Estado),",
+				"     disjoint: false) ~> split1@(valido, otro)",
+				"split1@valido sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          ParadaHistoricaId as string,",
