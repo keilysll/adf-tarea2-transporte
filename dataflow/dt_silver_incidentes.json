@@ -33,6 +33,9 @@
 				},
 				{
 					"name": "derivedColumn3"
+				},
+				{
+					"name": "split1"
 				}
 			],
 			"scriptLines": [
@@ -55,20 +58,21 @@
 				"          TipoIncidente = upper(trim(TipoIncidente)),",
 				"          Severidad = upper(trim(Severidad)),",
 				"          Descripcion = trim(Descripcion)) ~> derivedColumn1",
-				"derivedColumn1 derive(FechaHoraInicio = iif(instr(trim(FechaHoraInicio),'-')>0, toDate(trim(FechaHoraInicio),'yyyy-MM-dd'), toDate(trim(FechaHoraInicio),'dd/MM/yyyy')),",
-				"          FechaHoraFin = iif(instr(trim(FechaHoraFin),'-')>0, toDate(trim(FechaHoraFin),'yyyy-MM-dd'), toDate(trim(FechaHoraFin),'dd/MM/yyyy')),",
-				"          FechaHoraRegistro = iif(instr(trim(FechaHoraRegistro),'-')>0, toDate(trim(FechaHoraRegistro),'yyyy-MM-dd'), toDate(trim(FechaHoraRegistro),'dd/MM/yyyy'))) ~> derivedColumn2",
+				"derivedColumn1 derive(FechaHoraInicio = iif(instr(trim(FechaHoraInicio),'-')>0, toTimestamp(trim(FechaHoraInicio),'yyyy-MM-dd'), toTimestamp(trim(FechaHoraInicio),'dd/MM/yyyy')),",
+				"          FechaHoraFin = iif(instr(trim(FechaHoraFin),'-')>0, toTimestamp(trim(FechaHoraFin),'yyyy-MM-dd'), toTimestamp(trim(FechaHoraFin),'dd/MM/yyyy')),",
+				"          FechaHoraRegistro = iif(instr(trim(FechaHoraRegistro),'-')>0, toTimestamp(trim(FechaHoraRegistro),'yyyy-MM-dd'), toTimestamp(trim(FechaHoraRegistro),'dd/MM/yyyy'))) ~> derivedColumn2",
 				"derivedColumn2 derive(VehiculoId = iif(isNull(VehiculoId) || trim(VehiculoId)=='', toString(null()), upper(trim(VehiculoId)))) ~> derivedColumn3",
-				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"derivedColumn3 split(!isNull(IncidenteId) && !isNull(TipoIncidente) && !isNull(Severidad) && !isNull(FechaHoraInicio) && !isNull(FechaHoraFin) && !isNull(FechaHoraRegistro) && !isNull(Descripcion) && FechaHoraFin >= FechaHoraInicio && toDate(FechaHoraRegistro) >= toDate(FechaHoraInicio) && in(['AVERIA','ACCIDENTE_VIAL','CONGESTION','OBRA_VIAL','CLIMA'], TipoIncidente) && in(['BAJA','MEDIA','ALTA','CRITICA'], Severidad),",
+				"     disjoint: false) ~> split1@(validos, otros)",
+				"split1@validos sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
-				"          AnioFuente as string,",
 				"          IncidenteId as string,",
 				"          TipoIncidente as string,",
 				"          Severidad as string,",
-				"          FechaHoraInicio as string,",
-				"          FechaHoraFin as string,",
-				"          FechaHoraRegistro as string,",
+				"          FechaHoraInicio as timestamp,",
+				"          FechaHoraFin as timestamp,",
+				"          FechaHoraRegistro as timestamp,",
 				"          VehiculoId as string,",
 				"          Descripcion as string",
 				"     ),",
@@ -81,7 +85,6 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          AnioFuente,",
 				"          IncidenteId,",
 				"          TipoIncidente,",
 				"          Severidad,",
