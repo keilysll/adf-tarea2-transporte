@@ -1,0 +1,93 @@
+{
+	"name": "dt_silver_demandas_paradas",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "dw_bronze_demanda_paradas_sql",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_silver_demandas_paradas_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AnioFuente as string,",
+				"          DemandaId as string,",
+				"          FechaServicio as string,",
+				"          RutaHistoricaId as string,",
+				"          ParadaHistoricaId as string,",
+				"          Franja as string,",
+				"          ValidacionesTarjeta as string,",
+				"          Descensos as string,",
+				"          DemandaNoAtendida as string,",
+				"          Metodo as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(ParadaHistoricaId = upper(trim(ParadaHistoricaId)),",
+				"          Franja = trim(Franja),",
+				"          Descensos = toInteger(trim(Descensos)),",
+				"          DemandaNoAtendida = toInteger(trim(DemandaNoAtendida)),",
+				"          Metodo = upper(trim(Metodo)),",
+				"          ValidacionesTarjeta = toInteger(trim(ValidacionesTarjeta)),",
+				"          FechaServicio = iif(instr(trim(FechaServicio),'-')>0, toDate(trim(FechaServicio),'yyyy-MM-dd'), toDate(trim(FechaServicio),'dd/MM/yyyy'))) ~> derivedColumn1",
+				"derivedColumn1 derive(DemandaId = concat('DEM-', toString(FechaServicio,'yyyyMMdd'), '-', RutaHistoricaId, '-', ParadaHistoricaId, '-', replace(substring(Franja,1,5),':',''))) ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AnioFuente as string,",
+				"          DemandaId as string,",
+				"          FechaServicio as string,",
+				"          RutaHistoricaId as string,",
+				"          ParadaHistoricaId as string,",
+				"          Franja as string,",
+				"          ValidacionesTarjeta as string,",
+				"          Descensos as string,",
+				"          DemandaNoAtendida as string,",
+				"          Metodo as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          AnioFuente,",
+				"          DemandaId,",
+				"          RutaHistoricaId,",
+				"          ParadaHistoricaId,",
+				"          Franja,",
+				"          Metodo",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
