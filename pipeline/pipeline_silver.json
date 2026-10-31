@@ -85,7 +85,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dt_silver_paradas",
+						"referenceName": "dt_bronze_viajes",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -116,7 +116,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dt_silver_viajes",
+						"referenceName": "dt_bronze_paradas",
 						"type": "DataFlowReference"
 					},
 					"compute": {
